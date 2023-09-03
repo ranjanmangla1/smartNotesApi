@@ -150,7 +150,7 @@ app.post('/post-devto', async (req, res) => {
   };
 
   try {
-    const devtoResponse = await fetch(DEVTO_API_URL, {
+    const devtoResponse = await fetch("https://dev.to/api/articles", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
