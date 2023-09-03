@@ -93,7 +93,7 @@ app.post('/post-hashnode', async (req, res) => {
   }
 });
 
-app.post('/post-blog', async (req, res) => {
+app.post('/post-medium', async (req, res) => {
   const { title, content, canonicalUrl, tags } = req.body;
   const apiKey = req.header("Authorization"); 
 
@@ -128,6 +128,50 @@ app.post('/post-blog', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while posting the blog' });
   }
 });
+
+app.post('/post-devto', async (req, res) => {
+  const requestBody = req.body.article;
+  
+  const apiKey = req.header("Authorization"); 
+
+  const { title, body_markdown, tags, series, canonical_url, description, main_image } = requestBody;
+
+  console.log(requestBody);
+
+  const article = {
+    title,
+    published: true,
+    body_markdown,
+    tags,
+    series,
+    main_image: main_image, 
+    canonical_url: canonical_url, 
+    description: description, 
+  };
+
+  try {
+    const devtoResponse = await fetch(DEVTO_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': apiKey,
+      },
+      body: JSON.stringify({ article }),
+    });
+
+    const devtoData = await devtoResponse.json();
+
+    if (devtoResponse.ok) {
+      res.status(201).json({ message: 'Article posted successfully on dev.to', data: devtoData });
+    } else {
+      res.status(devtoResponse.status).json({ error: devtoData });
+    }
+  } catch (error) {
+    console.error('Error posting article:', error);
+    res.status(500).json({ error: 'An error occurred while posting the article' });
+  }
+});
+
 
 
 app.listen(port, () => {
